@@ -23,7 +23,7 @@ The first run of a new job uses the defaults; after it, Jenkins shows the parame
 
 | ID | Kind | Value |
 |----|------|-------|
-| `docker-cred` | Secret text | Docker Hub access token for `<user>` |
+| `docker-cred` | Username with password | `<user>` + a Docker Hub access token |
 | `github-token` | Username with password | `elevy99927-demos` + a GitHub token with write access to the gitops repo |
 
 ## Build agent requirements

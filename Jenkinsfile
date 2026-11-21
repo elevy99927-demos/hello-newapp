@@ -42,7 +42,7 @@ podTemplate(containers: [
       emptyDirVolume(mountPath: '/var/lib/docker', memory: false)
   ])  {
     // Credentials come from Jenkins (Manage Jenkins -> Credentials), not from Kubernetes secrets:
-    //   docker-cred  : Secret text            - Docker Hub access token for <user>
+    //   docker-cred  : Username with password - <user> + Docker Hub access token
     //   github-token : Username with password - elevy99927-demos + GitHub token (write access to gitops)
     node(POD_LABEL) {
         stage('checkout') {
@@ -61,8 +61,8 @@ podTemplate(containers: [
                 '''
                 // log in BEFORE the build: base images are pulled as <user>, not anonymously
                 // (all pods behind one NAT IP share Docker Hub's anonymous pull limit)
-                withCredentials([string(credentialsId: 'docker-cred', variable: 'DOCKER_TOKEN')]) {
-                    sh "echo \"\$DOCKER_TOKEN\" | docker login -u ${user} --password-stdin"
+                withCredentials([usernamePassword(credentialsId: 'docker-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_TOKEN')]) {
+                    sh "echo \"\$DOCKER_TOKEN\" | docker login -u \"\$DOCKER_USER\" --password-stdin"
                 }
                 echo "Building ${appimage}:${apptag}"
                 sh "docker build --network=host -t ${appimage}:${apptag} -t ${appimage}:latest \"${env.WORKSPACE}\""
